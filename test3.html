@@ -1,0 +1,98 @@
+<html>
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+	readFile();
+     google.charts.load('current', {packages: ['corechart', 'line']});
+google.charts.setOnLoadCallback(drawBackgroundColor);
+
+function drawBackgroundColor() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'X');
+      data.addColumn('number', 'Dogs');
+
+      data.addRows([
+        [0, 0],   [1, 10],  [2, 23],  [3, 17],  [4, 18],  [5, 9],
+        [6, 11],  [7, 27],  [8, 33],  [9, 40],  [10, 32], [11, 35],
+        [12, 30], [13, 40], [14, 42], [15, 47], [16, 44], [17, 48],
+        [18, 52], [19, 54], [20, 42], [21, 55], [22, 56], [23, 57],
+        [24, 60], [25, 50], [26, 52], [27, 51], [28, 49], [29, 53],
+        [30, 55], [31, 60], [32, 61], [33, 59], [34, 62], [35, 65],
+        [36, 62], [37, 58], [38, 20], [39, 61], [40, 64], [41, 65],
+        [42, 63], [43, 66], [44, 67], [45, 69], [46, 69], [47, 70],
+        [48, 72], [49, 68], [50, 66], [51, 65], [52, 67], [53, 70],
+        [54, 71], [55, 72], [56, 73], [57, 75], [58, 70], [59, 68],
+        [60, 64], [61, 60], [62, 65], [63, 67], [64, 68], [65, 69],
+        [66, 70], [67, 72], [68, 75], [69, 80]
+      ]);
+
+      var options = {
+        hAxis: {
+          title: 'Time'
+        },
+        vAxis: {
+          title: 'Popularity'
+        },
+        backgroundColor: '#f2f8e4'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+function readFile(){
+        var filePath = "405data.dat";
+        xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET",filePath,false);
+        xmlhttp.send(null);
+        var fileContent = xmlhttp.responseText;
+        //alert("Opened file:" + fileContent);
+        var data = parseCSV(fileContent);
+        alert("NO2[20]:" + data[20][0] + data[20][13]);
+        return fileContent;
+}
+
+function parseCSV(str) {
+    var arr = [];
+    var quote = false;  // true means we're inside a quoted field
+
+    // iterate over each character, keep track of current row and column (of the returned array)
+    for (var row = col = c = 0; c < str.length; c++) {
+        var cc = str[c], nc = str[c+1];        // current character, next character
+        arr[row] = arr[row] || [];             // create a new row if necessary
+        arr[row][col] = arr[row][col] || '';   // create a new column (start with empty string) if necessary
+
+        // If the current character is a quotation mark, and we're inside a
+        // quoted field, and the next character is also a quotation mark,
+        // add a quotation mark to the current column and skip the next character
+        if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+
+        // If it's just one quotation mark, begin/end quoted field
+        if (cc == '"') { quote = !quote; continue; }
+
+        // If it's a comma and we're not in a quoted field, move on to the next column
+        if (cc == ',' && !quote) { ++col; continue; }
+
+        // If it's a newline (CRLF) and we're not in a quoted field, skip the next character
+        // and move on to the next row and move to column 0 of that new row
+        if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+
+        // If it's a newline (LF or CR) and we're not in a quoted field,
+        // move on to the next row and move to column 0 of that new row
+        if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+        if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+
+        // Otherwise, append the current character to the current column
+        arr[row][col] += cc;
+    }
+//    alert("NO2=" + arr[1][0] + " ppb, measured at " + arr[1][13]);
+    return arr;
+}
+    </script>
+  </head>
+
+  <body>
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>
+  </body>
+</html>

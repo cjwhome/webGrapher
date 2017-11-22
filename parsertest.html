@@ -1,0 +1,103 @@
+<html>
+  <head>
+
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+function readFile(){
+	var filePath = "405data.dat";
+	xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("GET",filePath,false);
+	xmlhttp.send(null);
+	var fileContent = xmlhttp.responseText;
+	//alert("Opened file:" + fileContent);
+	var data = parseCSV(fileContent);
+//	alert("NO2[20]:" + data[20][0] + data[20][13]);
+	return fileContent;
+}
+
+function parseCSV(str) {
+    var arr = [];
+    var quote = false;  // true means we're inside a quoted field
+
+    // iterate over each character, keep track of current row and column (of the returned array)
+    for (var row = col = c = 0; c < str.length; c++) {
+        var cc = str[c], nc = str[c+1];        // current character, next character
+        arr[row] = arr[row] || [];             // create a new row if necessary
+        arr[row][col] = arr[row][col] || '';   // create a new column (start with empty string) if necessary
+
+        // If the current character is a quotation mark, and we're inside a
+        // quoted field, and the next character is also a quotation mark,
+        // add a quotation mark to the current column and skip the next character
+        if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }  
+
+        // If it's just one quotation mark, begin/end quoted field
+        if (cc == '"') { quote = !quote; continue; }
+
+        // If it's a comma and we're not in a quoted field, move on to the next column
+        if (cc == ',' && !quote) { ++col; continue; }
+
+        // If it's a newline (CRLF) and we're not in a quoted field, skip the next character
+        // and move on to the next row and move to column 0 of that new row
+        if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+
+        // If it's a newline (LF or CR) and we're not in a quoted field,
+        // move on to the next row and move to column 0 of that new row
+        if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+        if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+
+        // Otherwise, append the current character to the current column
+        arr[row][col] += cc;
+    }
+//    alert("NO2=" + arr[1][0] + " ppb, measured at " + arr[1][13]);
+    return arr;
+}
+
+	//var fileData = readFile();
+	//var parsedData = parseCSV(fileData);
+//     	google.charts.load('current', {packages: ['corechart', 'line']});
+//	google.charts.setOnLoadCallback(drawGraph());
+	
+
+function drawGraph() {
+	var i;
+      var data = new google.visualization.DataTable();
+      data.addColumn('timeofday', 'Time');
+      data.addColumn('number', 'NO2');
+	
+	
+	//for (i=0; i < dataArray.length; i++) {
+	//	data.addRows();
+	//}	    
+
+	var string = new String("13.9,21.6,35.5,0,0,26.3,782.9,1636,79.1,0.978620,0.236,110.6,02/01/00,16:54:12,80\n15.6,21.6,35.5,0,0,26.3,782.9,1636,79.1,0.978622,0.236,110.6,02/01/00,16:54:17,80\n");
+        parseCSV(string);
+
+	data.addRows([[[8,10,5], 13.2], [[8,10,10], 1.6], [[8,10,15], 2.2]]);
+	data.addRows([[[8,10,20], 10.2], [[8,10,25], 0.6], [[8,10,30], 5.2]]);
+
+      var options = {
+        hAxis: {
+          title: 'Time'
+        },
+        vAxis: {
+          title: 'Value'
+        },
+        backgroundColor: '#f2f8e4'
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+
+    }
+
+google.charts.load('current', {packages: ['corechart', 'line']});
+google.charts.setOnLoadCallback(drawGraph());
+    </script>
+  </head>
+
+  <body>
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>
+  </body>
+</html>
