@@ -3,15 +3,20 @@
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-	readFile();
-     google.charts.load('current', {packages: ['corechart', 'line']});
-google.charts.setOnLoadCallback(drawBackgroundColor);
+	var data = readFile();
+	var parsedData = parseCSV(data);
+     	google.charts.load('current', {packages: ['corechart', 'line']});
+	google.charts.setOnLoadCallback(drawBackgroundColor);
 
 function drawBackgroundColor() {
       var data = new google.visualization.DataTable();
       data.addColumn('number', 'X');
       data.addColumn('number', 'Dogs');
+      
 
+	var dateTime = parsedData[0][12] + parsedData[0][13];
+	alert("Datetime:" + dateTime);
+	
       data.addRows([
         [0, 0],   [1, 10],  [2, 23],  [3, 17],  [4, 18],  [5, 9],
         [6, 11],  [7, 27],  [8, 33],  [9, 40],  [10, 32], [11, 35],
@@ -47,8 +52,8 @@ function readFile(){
         xmlhttp.send(null);
         var fileContent = xmlhttp.responseText;
         //alert("Opened file:" + fileContent);
-        var data = parseCSV(fileContent);
-        alert("NO2[20]:" + data[20][0] + data[20][13]);
+        //var data = parseCSV(fileContent);
+//        alert("NO2[20]:" + data[20][0] + data[20][13]);
         return fileContent;
 }
 
@@ -85,7 +90,7 @@ function parseCSV(str) {
         // Otherwise, append the current character to the current column
         arr[row][col] += cc;
     }
-//    alert("NO2=" + arr[1][0] + " ppb, measured at " + arr[1][13]);
+    //alert("NO2=" + arr[1][0] + " ppb, measured at " + arr[1][13]);
     return arr;
 }
     </script>
